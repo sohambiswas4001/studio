@@ -63,6 +63,17 @@ export function GameLayout({ roomId }: { roomId: string }) {
     canvasRef.current?.toggleFillMode();
   };
 
+  const handleSendMessage = (messageText: string) => {
+    // In a real app, you'd also check if the guess is correct.
+    const newMessage: Message = {
+      id: Math.random().toString(),
+      type: 'guess',
+      text: messageText,
+      sender: playerName,
+    };
+    setMessages(prev => [...prev, newMessage]);
+  };
+
   return (
     <div className="min-h-screen p-4 grid grid-cols-1 lg:grid-cols-[280px_1fr_280px] xl:grid-cols-[350px_1fr_350px] gap-4">
       <div className="hidden lg:block">
@@ -98,13 +109,13 @@ export function GameLayout({ roomId }: { roomId: string }) {
       </main>
       
       <div className="hidden lg:block">
-        <GuessingArea messages={messages} />
+        <GuessingArea messages={messages} onSendMessage={handleSendMessage} />
       </div>
 
        {/* Mobile layout: show scoreboard and guess area below main content */}
        <div className="lg:hidden grid grid-cols-1 md:grid-cols-2 gap-4">
           <Scoreboard players={players} />
-          <GuessingArea messages={messages} />
+          <GuessingArea messages={messages} onSendMessage={handleSendMessage} />
        </div>
 
     </div>

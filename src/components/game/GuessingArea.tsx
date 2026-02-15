@@ -18,10 +18,19 @@ export interface Message {
 
 interface GuessingAreaProps {
     messages: Message[];
+    onSendMessage: (message: string) => void;
 }
 
-export function GuessingArea({ messages }: GuessingAreaProps) {
+export function GuessingArea({ messages, onSendMessage }: GuessingAreaProps) {
     const [guess, setGuess] = useState("");
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!guess.trim()) return;
+        onSendMessage(guess);
+        setGuess("");
+    };
+
   return (
     <Card className="h-full flex flex-col shadow-lg">
       <CardHeader>
@@ -56,7 +65,7 @@ export function GuessingArea({ messages }: GuessingAreaProps) {
             ))}
           </div>
         </ScrollArea>
-        <form className="flex items-center gap-2" onSubmit={(e) => { e.preventDefault(); setGuess(''); }}>
+        <form className="flex items-center gap-2" onSubmit={handleSubmit}>
           <Input 
             placeholder="Type your guess..." 
             value={guess}
