@@ -5,7 +5,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState } from 'react';
 import { Button } from '../ui/button';
 import { Clock, Lightbulb, UserCheck, Copy } from 'lucide-react';
-import { Badge } from '../ui/badge';
 
 interface GameHeaderProps {
     isDrawer: boolean;
@@ -55,7 +54,6 @@ export function GameHeader({ isDrawer, roomId }: GameHeaderProps) {
           <Clock className="h-6 w-6" />
           <span>{`0:${timeLeft.toString().padStart(2, '0')}`}</span>
         </div>
-        <Badge>Round 3/10</Badge>
         <div className="hidden sm:flex items-center gap-1 rounded-lg bg-secondary pl-3">
           <span className="text-sm font-medium text-secondary-foreground">Room: {roomId}</span>
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleCopyToClipboard}>
