@@ -2,9 +2,9 @@
 
 import { getNewWordAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Button } from '../ui/button';
-import { Clock, Lightbulb, UserCheck, Copy, Loader2 } from 'lucide-react';
+import { Clock, UserCheck, Copy } from 'lucide-react';
 import { WordSelectionDialog } from './WordSelectionDialog';
 
 interface GameHeaderProps {
@@ -60,7 +60,7 @@ export function GameHeader({ isDrawer, roomId, playerName }: GameHeaderProps) {
     }
   }, [selectedWord, isDrawer]);
 
-  const handleGetWords = async () => {
+  const handleGetWords = useCallback(async () => {
     setIsLoading(true);
     // In a real app, these would come from game state
     const input = {
@@ -75,7 +75,15 @@ export function GameHeader({ isDrawer, roomId, playerName }: GameHeaderProps) {
       toast({ variant: 'destructive', title: 'Error', description: result.error || 'Could not fetch words.' });
     }
     setIsLoading(false);
-  };
+  }, [toast]);
+
+  // Automatically fetch words for the drawer
+  useEffect(() => {
+    if (isDrawer && !selectedWord && !isSelectingWord && !isLoading) {
+      handleGetWords();
+    }
+  }, [isDrawer, selectedWord, isSelectingWord, isLoading, handleGetWords]);
+
 
   const handleSelectWord = (word: string) => {
     setSelectedWord(word);
@@ -96,7 +104,7 @@ export function GameHeader({ isDrawer, roomId, playerName }: GameHeaderProps) {
 
   const wordToDisplay = useMemo(() => {
     if (!selectedWord) {
-        return <span className="text-muted-foreground text-2xl">Waiting for word...</span>;
+        return <span className="text-muted-foreground text-2xl">{'\u00A0'}</span>;
     }
     const word = isDrawer ? selectedWord : displayedWord;
     return word.split('').join(' ');
@@ -128,16 +136,7 @@ export function GameHeader({ isDrawer, roomId, playerName }: GameHeaderProps) {
         </div>
         
         <div className="flex items-center gap-2 min-w-[170px] justify-end">
-          {isDrawer ? (
-            <Button onClick={handleGetWords} disabled={isLoading || isSelectingWord || !!selectedWord}>
-              {isLoading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                  <Lightbulb className="mr-2 h-4 w-4" />
-              )}
-              Get New Word
-            </Button>
-          ) : (
+          {!isDrawer && (
             <div className="flex items-center gap-2 text-lg font-medium text-muted-foreground">
                <UserCheck/> {drawerName} is drawing
             </div>
