@@ -1,16 +1,9 @@
-import { GameLayout } from '@/components/game/GameLayout';
-import { Suspense } from 'react';
+"use client";
 
-function GamePageContent({ params }: { params: { roomId: string } }) {
-  return <GameLayout roomId={params.roomId} />;
-}
+import { GameLayout } from '@/components/game/GameLayout';
 
 export default function GamePage({ params }: { params: { roomId: string } }) {
   // Here you could fetch room data based on params.roomId
   // and pass it to GameLayout
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <GamePageContent params={params} />
-    </Suspense>
-  );
+  return <GameLayout roomId={params.roomId} />;
 }
