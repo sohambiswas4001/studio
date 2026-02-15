@@ -9,6 +9,7 @@ export interface Player {
   name: string;
   score: number;
   isDrawer: boolean;
+  hasGuessedCorrectly?: boolean;
 }
 
 interface ScoreboardProps {
@@ -37,7 +38,12 @@ export function Scoreboard({ players }: ScoreboardProps) {
           </TableHeader>
           <TableBody>
             {sortedPlayers.map((player, index) => (
-              <TableRow key={player.id}>
+              <TableRow 
+                key={player.id}
+                className={cn(
+                  player.hasGuessedCorrectly && "bg-green-100 dark:bg-green-900/50"
+                )}
+              >
                 <TableCell className="font-medium">{index + 1}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">

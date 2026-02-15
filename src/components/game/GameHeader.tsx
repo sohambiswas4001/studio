@@ -27,10 +27,11 @@ interface GameHeaderProps {
     playerCount: number;
     roundTime: number;
     difficulty: Difficulty;
+    onWordSelect: (word: string) => void;
+    selectedWord: string;
 }
 
-export function GameHeader({ isDrawer, roomId, playerName, playerCount, roundTime, difficulty }: GameHeaderProps) {
-  const [selectedWord, setSelectedWord] = useState('');
+export function GameHeader({ isDrawer, roomId, playerName, playerCount, roundTime, difficulty, onWordSelect, selectedWord }: GameHeaderProps) {
   const [displayedWord, setDisplayedWord] = useState('');
   const [timeLeft, setTimeLeft] = useState(roundTime);
   const [wordChoices, setWordChoices] = useState<string[]>([]);
@@ -109,7 +110,7 @@ export function GameHeader({ isDrawer, roomId, playerName, playerCount, roundTim
 
 
   const handleSelectWord = (word: string) => {
-    setSelectedWord(word);
+    onWordSelect(word);
     setDisplayedWord(word.replace(/[a-zA-Z]/g, '_'));
     setIsSelectingWord(false);
     setDrawerName(playerName);

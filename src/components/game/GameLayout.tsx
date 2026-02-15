@@ -25,6 +25,8 @@ export function GameLayout({ roomId }: { roomId: string }) {
   const [roundTime, setRoundTime] = useState(90);
   const [difficulty, setDifficulty] = useState<Difficulty>('intermediate');
 
+  const [selectedWord, setSelectedWord] = useState('');
+
   useEffect(() => {
     const name = searchParams.get('player') || 'Anonymous';
     const timeParam = searchParams.get('time');
@@ -77,14 +79,33 @@ export function GameLayout({ roomId }: { roomId: string }) {
   };
 
   const handleSendMessage = (messageText: string) => {
-    // In a real app, you'd also check if the guess is correct.
-    const newMessage: Message = {
-      id: Math.random().toString(),
-      type: 'guess',
-      text: messageText,
-      sender: playerName,
-    };
-    setMessages(prev => [...prev, newMessage]);
+    const isCorrect = selectedWord && messageText.trim().toLowerCase() === selectedWord.toLowerCase();
+    
+    if (isCorrect) {
+        const newMessage: Message = {
+            id: Math.random().toString(),
+            type: 'correct',
+            text: `guessed the word!`,
+            sender: playerName,
+          };
+          setMessages(prev => [...prev, newMessage]);
+
+          setPlayers(prevPlayers => prevPlayers.map(p => {
+              if (p.name === playerName && !p.hasGuessedCorrectly) {
+                  return { ...p, score: p.score + 50, hasGuessedCorrectly: true };
+              }
+              return p;
+          }));
+
+    } else {
+        const newMessage: Message = {
+          id: Math.random().toString(),
+          type: 'guess',
+          text: messageText,
+          sender: playerName,
+        };
+        setMessages(prev => [...prev, newMessage]);
+    }
   };
 
   return (
@@ -101,6 +122,8 @@ export function GameLayout({ roomId }: { roomId: string }) {
           playerCount={players.length}
           roundTime={roundTime}
           difficulty={difficulty}
+          onWordSelect={setSelectedWord}
+          selectedWord={selectedWord}
         />
         
         <DrawingCanvas 
