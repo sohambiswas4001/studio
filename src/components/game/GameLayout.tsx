@@ -7,7 +7,7 @@ import { GuessingArea } from '@/components/game/GuessingArea';
 import { Scoreboard } from '@/components/game/Scoreboard';
 import { Toolbar } from '@/components/game/Toolbar';
 
-export function GameLayout() {
+export function GameLayout({ roomId }: { roomId: string }) {
   const [color, setColor] = useState('#000000');
   const [lineWidth, setLineWidth] = useState(5);
   const canvasRef = useRef<DrawingCanvasRef>(null);
@@ -26,7 +26,7 @@ export function GameLayout() {
       </div>
       
       <main className="flex flex-col gap-4 min-w-0">
-        <GameHeader isDrawer={isCurrentUserDrawer} />
+        <GameHeader isDrawer={isCurrentUserDrawer} roomId={roomId} />
         <DrawingCanvas 
           ref={canvasRef}
           color={isCurrentUserDrawer ? color : 'transparent'} // Non-drawers can't draw

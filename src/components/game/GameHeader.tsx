@@ -4,14 +4,15 @@ import { getNewWordAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState } from 'react';
 import { Button } from '../ui/button';
-import { Clock, Lightbulb, UserCheck } from 'lucide-react';
+import { Clock, Lightbulb, UserCheck, Copy } from 'lucide-react';
 import { Badge } from '../ui/badge';
 
 interface GameHeaderProps {
     isDrawer: boolean;
+    roomId: string;
 }
 
-export function GameHeader({ isDrawer }: GameHeaderProps) {
+export function GameHeader({ isDrawer, roomId }: GameHeaderProps) {
   const [word, setWord] = useState('');
   const [timeLeft, setTimeLeft] = useState(90);
   const { toast } = useToast();
@@ -39,7 +40,13 @@ export function GameHeader({ isDrawer }: GameHeaderProps) {
     }
   };
 
-  const displayWord = word ? (isDrawer ? word.split('').join(' ') : word.replace(/./g, '_ ')) : 'Press "Get Word"';
+  const handleCopyToClipboard = () => {
+    navigator.clipboard.writeText(roomId);
+    toast({
+        title: 'Room ID Copied!',
+        description: 'You can now share it with your friends.',
+    });
+  };
 
   return (
     <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -49,6 +56,12 @@ export function GameHeader({ isDrawer }: GameHeaderProps) {
           <span>{`0:${timeLeft.toString().padStart(2, '0')}`}</span>
         </div>
         <Badge>Round 3/10</Badge>
+        <div className="hidden sm:flex items-center gap-1 rounded-lg bg-secondary pl-3">
+          <span className="text-sm font-medium text-secondary-foreground">Room: {roomId}</span>
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleCopyToClipboard}>
+              <Copy className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
       
       <div className="font-headline text-3xl sm:text-4xl font-bold tracking-widest text-center text-primary">
