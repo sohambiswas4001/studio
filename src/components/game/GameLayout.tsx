@@ -7,8 +7,6 @@ import { GameHeader } from '@/components/game/GameHeader';
 import { GuessingArea, type Message } from '@/components/game/GuessingArea';
 import { Scoreboard, type Player } from '@/components/game/Scoreboard';
 import { Toolbar } from '@/components/game/Toolbar';
-import { Card, CardContent } from '@/components/ui/card';
-import { Loader2 } from 'lucide-react';
 
 export function GameLayout({ roomId }: { roomId: string }) {
   const [color, setColor] = useState('#000000');
@@ -51,7 +49,6 @@ export function GameLayout({ roomId }: { roomId: string }) {
 
   // In a real app, this would be determined by game state and user session
   const isCurrentUserDrawer = true;
-  const waitingForPlayers = players.length < 2;
 
   const handleClearCanvas = () => {
     canvasRef.current?.clear();
@@ -78,37 +75,21 @@ export function GameLayout({ roomId }: { roomId: string }) {
           playerName={playerName} 
         />
         
-        {waitingForPlayers ? (
-          <Card className="flex-1 flex flex-col items-center justify-center bg-muted/50">
-            <CardContent className="text-center p-6">
-              <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
-              <h2 className="text-2xl font-bold tracking-tight text-primary">
-                Waiting for players...
-              </h2>
-              <p className="text-muted-foreground">
-                The game will start once at least 2 players have joined.
-              </p>
-            </CardContent>
-          </Card>
-        ) : (
-          <>
-            <DrawingCanvas 
-              ref={canvasRef}
-              color={isCurrentUserDrawer ? color : 'transparent'} // Non-drawers can't draw
-              lineWidth={lineWidth}
-            />
-            {isCurrentUserDrawer && (
-              <Toolbar 
-                color={color}
-                setColor={setColor}
-                lineWidth={lineWidth}
-                setLineWidth={setLineWidth}
-                onClear={handleClearCanvas}
-                onUndo={handleUndo}
-                onFill={handleToggleFillMode}
-              />
-            )}
-          </>
+        <DrawingCanvas 
+          ref={canvasRef}
+          color={isCurrentUserDrawer ? color : 'transparent'} // Non-drawers can't draw
+          lineWidth={lineWidth}
+        />
+        {isCurrentUserDrawer && (
+          <Toolbar 
+            color={color}
+            setColor={setColor}
+            lineWidth={lineWidth}
+            setLineWidth={setLineWidth}
+            onClear={handleClearCanvas}
+            onUndo={handleUndo}
+            onFill={handleToggleFillMode}
+          />
         )}
       </main>
       
