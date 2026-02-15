@@ -6,6 +6,8 @@ type Point = { x: number; y: number };
 
 export function useDrawing(
   onDraw: (ctx: CanvasRenderingContext2D, point: Point, prevPoint: Point | null) => void,
+  onDrawEnd?: () => void,
+  enabled: boolean = true
 ) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const prevPointRef = useRef<Point | null>(null);
@@ -30,6 +32,8 @@ export function useDrawing(
   };
 
   useEffect(() => {
+    if (!enabled) return;
+    
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -53,8 +57,10 @@ export function useDrawing(
     };
 
     const handleEnd = () => {
+      if (!isDrawingRef.current) return;
       isDrawingRef.current = false;
       prevPointRef.current = null;
+      onDrawEnd?.();
     };
 
     // Mouse events
@@ -76,7 +82,7 @@ export function useDrawing(
       canvas.removeEventListener('touchmove', handleMove);
       canvas.removeEventListener('touchend', handleEnd);
     };
-  }, [onDraw]);
+  }, [onDraw, onDrawEnd, enabled]);
 
   return { canvasRef };
 }

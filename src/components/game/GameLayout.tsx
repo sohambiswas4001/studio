@@ -16,33 +16,46 @@ export function GameLayout({ roomId }: { roomId: string }) {
   const searchParams = useSearchParams();
   const [players, setPlayers] = useState<Player[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [playerName, setPlayerName] = useState<string | null>(null);
   
   useEffect(() => {
-    const playerName = searchParams.get('player');
-    if (playerName) {
-      const newPlayer = {
-        id: Math.random().toString(),
-        name: playerName,
-        score: 0,
-        isDrawer: true // First player is the drawer
-      };
-      setPlayers([newPlayer]);
+    const name = searchParams.get('player');
+    setPlayerName(name);
 
+    if (name) {
+      // In a real app, you'd fetch players from a server/DB
+      // and check if you are re-joining.
+      // For now, we just add the new player.
+      const newPlayer: Player = {
+        id: Math.random().toString(36).substring(7),
+        name: name,
+        score: 0,
+        isDrawer: true // For now, the first player is always the drawer.
+      };
+      setPlayers(prev => [...prev, newPlayer]);
+      
       const newMessage: Message = {
         id: Math.random().toString(),
         type: 'system',
-        text: `${playerName} has joined the room!`,
+        text: `${name} has joined the room!`,
       };
-      setMessages([newMessage]);
+      setMessages(prev => [...prev, newMessage]);
     }
   }, [searchParams]);
-
 
   // In a real app, this would be determined by game state and user session
   const isCurrentUserDrawer = true;
 
   const handleClearCanvas = () => {
     canvasRef.current?.clear();
+  };
+
+  const handleUndo = () => {
+    canvasRef.current?.undo();
+  };
+
+  const handleToggleFillMode = () => {
+    canvasRef.current?.toggleFillMode();
   };
 
   return (
@@ -65,6 +78,8 @@ export function GameLayout({ roomId }: { roomId: string }) {
             lineWidth={lineWidth}
             setLineWidth={setLineWidth}
             onClear={handleClearCanvas}
+            onUndo={handleUndo}
+            onFill={handleToggleFillMode}
           />
         )}
       </main>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Eraser, Paintbrush, Trash2 } from 'lucide-react';
+import { Eraser, Paintbrush, Trash2, Undo2, PaintBucket, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,7 +10,7 @@ const COLORS = [
   '#000000', '#EF4444', '#F97316', '#EAB308', '#22C55E', '#3B82F6', '#8B5CF6', '#FFFFFF'
 ];
 
-const ERASER_COLOR = '#F0F8FF' // Matches --background HSL
+const ERASER_COLOR = '#FFFFFF'
 
 interface ToolbarProps {
   color: string;
@@ -18,9 +18,16 @@ interface ToolbarProps {
   lineWidth: number;
   setLineWidth: (width: number) => void;
   onClear: () => void;
+  onUndo: () => void;
+  onFill: () => void;
 }
 
-export function Toolbar({ color, setColor, lineWidth, setLineWidth, onClear }: ToolbarProps) {
+export function Toolbar({ color, setColor, lineWidth, setLineWidth, onClear, onUndo, onFill }: ToolbarProps) {
+  const handleRandomColor = () => {
+    const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+    setColor(randomColor);
+  };
+  
   return (
     <Card className="shadow-lg">
       <CardContent className="p-2 flex flex-wrap items-center justify-center gap-4">
@@ -42,6 +49,19 @@ export function Toolbar({ color, setColor, lineWidth, setLineWidth, onClear }: T
              <Eraser className={cn(color === ERASER_COLOR && 'text-primary')}/>
           </Button>
         </div>
+        
+        <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={handleRandomColor} aria-label="Random color">
+                <Palette />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={onFill} aria-label="Fill">
+                <PaintBucket />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={onUndo} aria-label="Undo">
+                <Undo2 />
+            </Button>
+        </div>
+
         <div className="flex items-center gap-4 w-full sm:w-auto">
            <Paintbrush className="h-5 w-5" />
            <Slider
