@@ -20,9 +20,10 @@ interface ToolbarProps {
   onClear: () => void;
   onUndo: () => void;
   onFill: () => void;
+  isFillMode: boolean;
 }
 
-export function Toolbar({ color, setColor, lineWidth, setLineWidth, onClear, onUndo, onFill }: ToolbarProps) {
+export function Toolbar({ color, setColor, lineWidth, setLineWidth, onClear, onUndo, onFill, isFillMode }: ToolbarProps) {
   const handleRandomColor = () => {
     const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
     setColor(randomColor);
@@ -38,15 +39,15 @@ export function Toolbar({ color, setColor, lineWidth, setLineWidth, onClear, onU
               onClick={() => setColor(c)}
               className={cn(
                 "w-8 h-8 rounded-full border-2 transition-transform transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring",
-                color === c && c !== ERASER_COLOR ? 'border-primary scale-110' : 'border-transparent',
+                color === c && c !== ERASER_COLOR && !isFillMode ? 'border-primary scale-110' : 'border-transparent',
                 c === '#FFFFFF' && 'border-muted'
               )}
               style={{ backgroundColor: c }}
               aria-label={`Color ${c}`}
             />
           ))}
-          <Button variant="ghost" size="icon" onClick={() => setColor(ERASER_COLOR)} aria-label="Eraser">
-             <Eraser className={cn(color === ERASER_COLOR && 'text-primary')}/>
+          <Button variant="ghost" size="icon" onClick={() => setColor(ERASER_COLOR)} aria-label="Eraser" className={cn(color === ERASER_COLOR && !isFillMode && 'bg-accent text-accent-foreground')}>
+             <Eraser />
           </Button>
         </div>
         
@@ -54,7 +55,7 @@ export function Toolbar({ color, setColor, lineWidth, setLineWidth, onClear, onU
             <Button variant="ghost" size="icon" onClick={handleRandomColor} aria-label="Random color">
                 <Palette />
             </Button>
-            <Button variant="ghost" size="icon" onClick={onFill} aria-label="Fill">
+            <Button variant="ghost" size="icon" onClick={onFill} aria-label="Fill" className={cn(isFillMode && 'bg-accent text-accent-foreground')}>
                 <PaintBucket />
             </Button>
             <Button variant="ghost" size="icon" onClick={onUndo} aria-label="Undo">

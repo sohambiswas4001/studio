@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 interface DrawingCanvasProps {
   color: string;
   lineWidth: number;
+  onModeChange?: (mode: 'draw' | 'fill') => void;
 }
 
 export interface DrawingCanvasRef {
@@ -82,10 +83,16 @@ const floodFill = (ctx: CanvasRenderingContext2D, x: number, y: number, fillColo
 }
 
 
-export const DrawingCanvas = forwardRef<DrawingCanvasRef, DrawingCanvasProps>(({ color, lineWidth }, ref) => {
+export const DrawingCanvas = forwardRef<DrawingCanvasRef, DrawingCanvasProps>(({ color, lineWidth, onModeChange }, ref) => {
   const [mode, setMode] = useState<'draw' | 'fill'>('draw');
   const [history, setHistory] = useState<ImageData[]>([]);
   const historyPointerRef = useRef(0);
+
+  useEffect(() => {
+    if(onModeChange) {
+      onModeChange(mode);
+    }
+  }, [mode, onModeChange]);
   
   const drawLine = useCallback(
     (ctx: CanvasRenderingContext2D, point: {x: number, y: number}, prevPoint: {x: number, y: number} | null) => {

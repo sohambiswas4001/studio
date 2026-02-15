@@ -12,6 +12,7 @@ export function GameLayout({ roomId }: { roomId: string }) {
   const [color, setColor] = useState('#000000');
   const [lineWidth, setLineWidth] = useState(5);
   const canvasRef = useRef<DrawingCanvasRef>(null);
+  const [isFillMode, setIsFillMode] = useState(false);
 
   const searchParams = useSearchParams();
   const [players, setPlayers] = useState<Player[]>([]);
@@ -79,6 +80,7 @@ export function GameLayout({ roomId }: { roomId: string }) {
           ref={canvasRef}
           color={isCurrentUserDrawer ? color : 'transparent'} // Non-drawers can't draw
           lineWidth={lineWidth}
+          onModeChange={(mode) => setIsFillMode(mode === 'fill')}
         />
         {isCurrentUserDrawer && (
           <Toolbar 
@@ -89,6 +91,7 @@ export function GameLayout({ roomId }: { roomId: string }) {
             onClear={handleClearCanvas}
             onUndo={handleUndo}
             onFill={handleToggleFillMode}
+            isFillMode={isFillMode}
           />
         )}
       </main>
