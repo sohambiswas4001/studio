@@ -4,7 +4,7 @@ import { getNewWordAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Button, buttonVariants } from '../ui/button';
-import { Clock, UserCheck, Copy, Trash2 } from 'lucide-react';
+import { Clock, UserCheck, Copy, Trash2, Loader2 } from 'lucide-react';
 import { WordSelectionDialog } from './WordSelectionDialog';
 import { 
   AlertDialog, 
@@ -133,12 +133,20 @@ export function GameHeader({ isDrawer, roomId, playerName, playerCount }: GameHe
     if (isDrawer && playerCount < 2) {
         return <span className="text-muted-foreground text-2xl">Waiting for players...</span>;
     }
+    if (isLoading) {
+        return (
+            <div className="flex items-center gap-2 text-muted-foreground text-xl">
+                <Loader2 className="animate-spin" />
+                <span>Generating words...</span>
+            </div>
+        );
+    }
     if (!selectedWord) {
         return <span className="text-muted-foreground text-2xl">{'\u00A0'}</span>;
     }
     const word = isDrawer ? selectedWord : displayedWord;
     return word.split('').join(' ');
-  }, [selectedWord, isDrawer, displayedWord, playerCount]);
+  }, [selectedWord, isDrawer, displayedWord, playerCount, isLoading]);
 
   return (
     <>
