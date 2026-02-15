@@ -3,9 +3,20 @@
 import { getNewWordAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { Button } from '../ui/button';
-import { Clock, UserCheck, Copy } from 'lucide-react';
+import { Button, buttonVariants } from '../ui/button';
+import { Clock, UserCheck, Copy, Trash2 } from 'lucide-react';
 import { WordSelectionDialog } from './WordSelectionDialog';
+import { 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle 
+} from '@/components/ui/alert-dialog';
+import { useRouter } from 'next/navigation';
 
 interface GameHeaderProps {
     isDrawer: boolean;
@@ -21,8 +32,11 @@ export function GameHeader({ isDrawer, roomId, playerName }: GameHeaderProps) {
   const [isSelectingWord, setIsSelectingWord] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [drawerName, setDrawerName] = useState('DoodleWizard');
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   
   const { toast } = useToast();
+  const router = useRouter();
+
 
   // Timer effect
   useEffect(() => {
@@ -102,6 +116,18 @@ export function GameHeader({ isDrawer, roomId, playerName }: GameHeaderProps) {
     });
   };
 
+  const handleDeleteRoom = () => {
+    // In a real app, this would involve a server call.
+    // For now, we just redirect to the home page.
+    setIsDeleteDialogOpen(false);
+    router.push('/');
+    toast({
+        variant: 'default',
+        title: 'Room Deleted',
+        description: `The room ${roomId} has been deleted.`,
+    });
+  };
+
   const wordToDisplay = useMemo(() => {
     if (!selectedWord) {
         return <span className="text-muted-foreground text-2xl">{'\u00A0'}</span>;
@@ -117,6 +143,26 @@ export function GameHeader({ isDrawer, roomId, playerName }: GameHeaderProps) {
         words={wordChoices}
         onSelectWord={handleSelectWord}
       />
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the room
+              and remove all players.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteRoom}
+              className={buttonVariants({ variant: "destructive" })}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-xl font-semibold">
@@ -128,6 +174,11 @@ export function GameHeader({ isDrawer, roomId, playerName }: GameHeaderProps) {
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleCopyToClipboard}>
                 <Copy className="h-4 w-4" />
             </Button>
+            {isDrawer && (
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" onClick={() => setIsDeleteDialogOpen(true)}>
+                    <Trash2 className="h-4 w-4" />
+                </Button>
+            )}
           </div>
         </div>
         
