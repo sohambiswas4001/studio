@@ -41,7 +41,7 @@ export const DrawingCanvas = forwardRef<DrawingCanvasRef, DrawingCanvasProps>(({
   }));
 
   return (
-    <div className="relative w-full aspect-video bg-white rounded-lg shadow-inner border overflow-hidden touch-none">
+    <div className="relative w-full aspect-video bg-white rounded-lg shadow-inner border overflow-hidden touch-none cursor-crosshair">
       <canvas ref={canvasRef} className="w-full h-full" width="1280" height="720" />
     </div>
   );

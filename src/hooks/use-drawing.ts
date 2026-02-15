@@ -16,13 +16,16 @@ export function useDrawing(
     if (!canvas) return null;
 
     const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
     const isTouchEvent = 'touches' in e;
     const clientX = isTouchEvent ? e.touches[0].clientX : e.clientX;
     const clientY = isTouchEvent ? e.touches[0].clientY : e.clientY;
 
     return {
-      x: clientX - rect.left,
-      y: clientY - rect.top,
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY,
     };
   };
 
@@ -43,8 +46,10 @@ export function useDrawing(
       if (!isDrawingRef.current) return;
       e.preventDefault();
       const point = getCanvasPoint(e);
-      onDraw(ctx, point!, prevPointRef.current);
-      prevPointRef.current = point;
+      if (point) {
+        onDraw(ctx, point, prevPointRef.current);
+        prevPointRef.current = point;
+      }
     };
 
     const handleEnd = () => {
