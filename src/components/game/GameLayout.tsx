@@ -73,7 +73,8 @@ export function GameLayout({ roomId }: { roomId: string }) {
         <GameHeader 
           isDrawer={isCurrentUserDrawer} 
           roomId={roomId}
-          playerName={playerName} 
+          playerName={playerName}
+          playerCount={players.length}
         />
         
         <DrawingCanvas 

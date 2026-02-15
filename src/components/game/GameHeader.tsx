@@ -22,9 +22,10 @@ interface GameHeaderProps {
     isDrawer: boolean;
     roomId: string;
     playerName: string;
+    playerCount: number;
 }
 
-export function GameHeader({ isDrawer, roomId, playerName }: GameHeaderProps) {
+export function GameHeader({ isDrawer, roomId, playerName, playerCount }: GameHeaderProps) {
   const [selectedWord, setSelectedWord] = useState('');
   const [displayedWord, setDisplayedWord] = useState('');
   const [timeLeft, setTimeLeft] = useState(90);
@@ -93,10 +94,10 @@ export function GameHeader({ isDrawer, roomId, playerName }: GameHeaderProps) {
 
   // Automatically fetch words for the drawer
   useEffect(() => {
-    if (isDrawer && !selectedWord && !isSelectingWord && !isLoading) {
+    if (isDrawer && !selectedWord && !isSelectingWord && !isLoading && playerCount >= 2) {
       handleGetWords();
     }
-  }, [isDrawer, selectedWord, isSelectingWord, isLoading, handleGetWords]);
+  }, [isDrawer, selectedWord, isSelectingWord, isLoading, handleGetWords, playerCount]);
 
 
   const handleSelectWord = (word: string) => {
@@ -129,12 +130,15 @@ export function GameHeader({ isDrawer, roomId, playerName }: GameHeaderProps) {
   };
 
   const wordToDisplay = useMemo(() => {
+    if (isDrawer && playerCount < 2) {
+        return <span className="text-muted-foreground text-2xl">Waiting for players...</span>;
+    }
     if (!selectedWord) {
         return <span className="text-muted-foreground text-2xl">{'\u00A0'}</span>;
     }
     const word = isDrawer ? selectedWord : displayedWord;
     return word.split('').join(' ');
-  }, [selectedWord, isDrawer, displayedWord]);
+  }, [selectedWord, isDrawer, displayedWord, playerCount]);
 
   return (
     <>
