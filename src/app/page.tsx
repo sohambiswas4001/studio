@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from '@/components/ui/label';
-import { PartyPopper, LogIn, Cog } from 'lucide-react';
+import { PartyPopper, LogIn, Cog, Loader2 } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -27,16 +27,19 @@ export default function Home() {
   const [joinRoomId, setJoinRoomId] = useState('');
   const [roundTime, setRoundTime] = useState(90);
   const [difficulty, setDifficulty] = useState<Difficulty>('intermediate');
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const handleCreateRoom = () => {
     if (!playerName.trim()) return;
+    setIsLoading(true);
     const roomId = Math.random().toString(36).substring(2, 10);
     router.push(`/game/${roomId}?player=${encodeURIComponent(playerName)}&time=${roundTime}&difficulty=${difficulty}`);
   };
   
   const handleJoinRoom = () => {
     if (!playerName.trim() || !joinRoomId.trim()) return;
+    setIsLoading(true);
     router.push(`/game/${joinRoomId.trim()}?player=${encodeURIComponent(playerName)}`);
   }
 
@@ -66,8 +69,8 @@ export default function Home() {
           </div>
 
           <div className="flex gap-2">
-            <Button onClick={handleCreateRoom} className="w-full" size="lg" disabled={!playerName.trim()}>
-              <PartyPopper className="mr-2 h-5 w-5" />
+            <Button onClick={handleCreateRoom} className="w-full" size="lg" disabled={!playerName.trim() || isLoading}>
+              {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <PartyPopper className="mr-2 h-5 w-5" />}
               Create Private Room
             </Button>
             <Sheet>
@@ -153,8 +156,8 @@ export default function Home() {
                 aria-label="Room ID"
                 />
             </div>
-            <Button onClick={handleJoinRoom} className="w-full" size="lg" variant="secondary" disabled={!playerName.trim() || !joinRoomId.trim()}>
-                <LogIn className="mr-2 h-5 w-5" />
+            <Button onClick={handleJoinRoom} className="w-full" size="lg" variant="secondary" disabled={!playerName.trim() || !joinRoomId.trim() || isLoading}>
+                {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <LogIn className="mr-2 h-5 w-5" />}
                 Join Room
             </Button>
           </div>
