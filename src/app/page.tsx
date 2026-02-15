@@ -6,17 +6,33 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from '@/components/ui/label';
-import { PartyPopper, LogIn } from 'lucide-react';
+import { PartyPopper, LogIn, Cog } from 'lucide-react';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetFooter,
+  SheetClose
+} from "@/components/ui/sheet";
+import { Slider } from '@/components/ui/slider';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+
+type Difficulty = 'beginner' | 'intermediate' | 'advanced';
 
 export default function Home() {
   const [playerName, setPlayerName] = useState('');
   const [joinRoomId, setJoinRoomId] = useState('');
+  const [roundTime, setRoundTime] = useState(90);
+  const [difficulty, setDifficulty] = useState<Difficulty>('intermediate');
   const router = useRouter();
 
   const handleCreateRoom = () => {
     if (!playerName.trim()) return;
     const roomId = Math.random().toString(36).substring(2, 10);
-    router.push(`/game/${roomId}?player=${encodeURIComponent(playerName)}`);
+    router.push(`/game/${roomId}?player=${encodeURIComponent(playerName)}&time=${roundTime}&difficulty=${difficulty}`);
   };
   
   const handleJoinRoom = () => {
@@ -49,10 +65,70 @@ export default function Home() {
             />
           </div>
 
-          <Button onClick={handleCreateRoom} className="w-full" size="lg" disabled={!playerName.trim()}>
-            <PartyPopper className="mr-2 h-5 w-5" />
-            Create Private Room
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={handleCreateRoom} className="w-full" size="lg" disabled={!playerName.trim()}>
+              <PartyPopper className="mr-2 h-5 w-5" />
+              Create Private Room
+            </Button>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="lg" className="px-3">
+                  <Cog className="h-6 w-6" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent>
+                <SheetHeader>
+                  <SheetTitle>Game Settings</SheetTitle>
+                  <SheetDescription>
+                    Adjust the settings for the new game room.
+                  </SheetDescription>
+                </SheetHeader>
+                <div className="grid gap-6 py-6">
+                  <div className="space-y-4">
+                    <Label htmlFor="round-time">Round Time (seconds)</Label>
+                    <div className="flex items-center gap-4">
+                        <Slider
+                            id="round-time"
+                            min={30}
+                            max={180}
+                            step={15}
+                            value={[roundTime]}
+                            onValueChange={(value) => setRoundTime(value[0])}
+                        />
+                        <span className="font-bold text-lg w-12 text-center">{roundTime}s</span>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <Label htmlFor="difficulty">Word Difficulty</Label>
+                    <RadioGroup 
+                        id="difficulty"
+                        value={difficulty} 
+                        onValueChange={(value: Difficulty) => setDifficulty(value)}
+                        className="grid grid-cols-3 gap-2"
+                    >
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="beginner" id="r1" />
+                            <Label htmlFor="r1">Beginner</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="intermediate" id="r2" />
+                            <Label htmlFor="r2">Intermediate</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="advanced" id="r3" />
+                            <Label htmlFor="r3">Advanced</Label>
+                        </div>
+                    </RadioGroup>
+                  </div>
+                </div>
+                <SheetFooter>
+                    <SheetClose asChild>
+                        <Button>Save changes</Button>
+                    </SheetClose>
+                </SheetFooter>
+              </SheetContent>
+            </Sheet>
+          </div>
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">

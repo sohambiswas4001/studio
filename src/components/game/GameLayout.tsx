@@ -8,6 +8,8 @@ import { GuessingArea, type Message } from '@/components/game/GuessingArea';
 import { Scoreboard, type Player } from '@/components/game/Scoreboard';
 import { Toolbar } from '@/components/game/Toolbar';
 
+type Difficulty = 'beginner' | 'intermediate' | 'advanced';
+
 export function GameLayout({ roomId }: { roomId: string }) {
   const [color, setColor] = useState('#000000');
   const [lineWidth, setLineWidth] = useState(5);
@@ -19,13 +21,24 @@ export function GameLayout({ roomId }: { roomId: string }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [playerName, setPlayerName] = useState<string>('');
   
+  // Game Settings
+  const [roundTime, setRoundTime] = useState(90);
+  const [difficulty, setDifficulty] = useState<Difficulty>('intermediate');
+
   useEffect(() => {
     const name = searchParams.get('player') || 'Anonymous';
+    const timeParam = searchParams.get('time');
+    const difficultyParam = searchParams.get('difficulty');
+    
     setPlayerName(name);
+    
+    if (timeParam) {
+      setRoundTime(parseInt(timeParam, 10));
+    }
+    if (difficultyParam) {
+      setDifficulty(difficultyParam as Difficulty);
+    }
 
-    // In a real app, you'd fetch players from a server/DB
-    // and check if you are re-joining.
-    // For now, we just add the new player, simulating a single player.
     const newPlayer: Player = {
       id: Math.random().toString(36).substring(7),
       name: name,
@@ -86,6 +99,8 @@ export function GameLayout({ roomId }: { roomId: string }) {
           roomId={roomId}
           playerName={playerName}
           playerCount={players.length}
+          roundTime={roundTime}
+          difficulty={difficulty}
         />
         
         <DrawingCanvas 

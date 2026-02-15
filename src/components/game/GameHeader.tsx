@@ -18,17 +18,21 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useRouter } from 'next/navigation';
 
+type Difficulty = 'beginner' | 'intermediate' | 'advanced';
+
 interface GameHeaderProps {
     isDrawer: boolean;
     roomId: string;
     playerName: string;
     playerCount: number;
+    roundTime: number;
+    difficulty: Difficulty;
 }
 
-export function GameHeader({ isDrawer, roomId, playerName, playerCount }: GameHeaderProps) {
+export function GameHeader({ isDrawer, roomId, playerName, playerCount, roundTime, difficulty }: GameHeaderProps) {
   const [selectedWord, setSelectedWord] = useState('');
   const [displayedWord, setDisplayedWord] = useState('');
-  const [timeLeft, setTimeLeft] = useState(90);
+  const [timeLeft, setTimeLeft] = useState(roundTime);
   const [wordChoices, setWordChoices] = useState<string[]>([]);
   const [isSelectingWord, setIsSelectingWord] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -38,6 +42,10 @@ export function GameHeader({ isDrawer, roomId, playerName, playerCount }: GameHe
   const { toast } = useToast();
   const router = useRouter();
 
+  // Reset timer if roundTime prop changes
+  useEffect(() => {
+    setTimeLeft(roundTime);
+  }, [roundTime]);
 
   // Timer effect
   useEffect(() => {
@@ -80,7 +88,7 @@ export function GameHeader({ isDrawer, roomId, playerName, playerCount }: GameHe
     // In a real app, these would come from game state
     const input = {
       drawnWords: [],
-      playerSkillLevel: 'intermediate' as const
+      playerSkillLevel: difficulty
     };
     const result = await getNewWordAction(input);
     if (result.success && result.words) {
@@ -90,7 +98,7 @@ export function GameHeader({ isDrawer, roomId, playerName, playerCount }: GameHe
       toast({ variant: 'destructive', title: 'Error', description: result.error || 'Could not fetch words.' });
     }
     setIsLoading(false);
-  }, [toast]);
+  }, [toast, difficulty]);
 
   // Automatically fetch words for the drawer
   useEffect(() => {
@@ -105,7 +113,7 @@ export function GameHeader({ isDrawer, roomId, playerName, playerCount }: GameHe
     setDisplayedWord(word.replace(/[a-zA-Z]/g, '_'));
     setIsSelectingWord(false);
     setDrawerName(playerName);
-    setTimeLeft(90); 
+    setTimeLeft(roundTime); 
     toast({ title: 'You are drawing!', description: `The word is "${word}". Good luck!` });
   };
 
