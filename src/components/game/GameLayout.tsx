@@ -16,31 +16,37 @@ export function GameLayout({ roomId }: { roomId: string }) {
   const searchParams = useSearchParams();
   const [players, setPlayers] = useState<Player[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [playerName, setPlayerName] = useState<string | null>(null);
+  const [playerName, setPlayerName] = useState<string>('');
   
   useEffect(() => {
-    const name = searchParams.get('player');
+    const name = searchParams.get('player') || 'Anonymous';
     setPlayerName(name);
 
-    if (name) {
-      // In a real app, you'd fetch players from a server/DB
-      // and check if you are re-joining.
-      // For now, we just add the new player.
-      const newPlayer: Player = {
-        id: Math.random().toString(36).substring(7),
-        name: name,
-        score: 0,
-        isDrawer: true // For now, the first player is always the drawer.
-      };
-      setPlayers(prev => [...prev, newPlayer]);
-      
+    // In a real app, you'd fetch players from a server/DB
+    // and check if you are re-joining.
+    // For now, we just add the new player.
+    const newPlayer: Player = {
+      id: Math.random().toString(36).substring(7),
+      name: name,
+      score: 0,
+      isDrawer: true // For now, the first player is always the drawer.
+    };
+    setPlayers(prev => {
+        // Avoid adding duplicate players on hot-reload in dev
+        if (prev.find(p => p.name === name)) return prev;
+        return [...prev, newPlayer];
+    });
+    
+    setMessages(prev => {
+      const joinMessage = `${name} has joined the room!`;
+      if (prev.find(m => m.text === joinMessage)) return prev;
       const newMessage: Message = {
         id: Math.random().toString(),
         type: 'system',
-        text: `${name} has joined the room!`,
+        text: joinMessage,
       };
-      setMessages(prev => [...prev, newMessage]);
-    }
+      return [...prev, newMessage];
+    });
   }, [searchParams]);
 
   // In a real app, this would be determined by game state and user session
@@ -65,7 +71,11 @@ export function GameLayout({ roomId }: { roomId: string }) {
       </div>
       
       <main className="flex flex-col gap-4 min-w-0">
-        <GameHeader isDrawer={isCurrentUserDrawer} roomId={roomId} />
+        <GameHeader 
+          isDrawer={isCurrentUserDrawer} 
+          roomId={roomId}
+          playerName={playerName} 
+        />
         <DrawingCanvas 
           ref={canvasRef}
           color={isCurrentUserDrawer ? color : 'transparent'} // Non-drawers can't draw

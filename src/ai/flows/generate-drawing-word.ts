@@ -1,6 +1,6 @@
 'use server';
 /**
- * @fileOverview A Genkit flow for generating a drawing word based on game history and player skill.
+ * @fileOverview A Genkit flow for generating drawing words based on game history and player skill.
  *
  * - generateDrawingWord - A function that handles the word generation process.
  * - GenerateDrawingWordInput - The input type for the generateDrawingWord function.
@@ -17,7 +17,7 @@ const GenerateDrawingWordInputSchema = z.object({
 export type GenerateDrawingWordInput = z.infer<typeof GenerateDrawingWordInputSchema>;
 
 const GenerateDrawingWordOutputSchema = z.object({
-  word: z.string().describe('The word for the player to draw, considering previous words and skill level.'),
+  words: z.array(z.string()).length(3).describe('An array of three unique words for the player to choose from, considering previous words and skill level.'),
 });
 export type GenerateDrawingWordOutput = z.infer<typeof GenerateDrawingWordOutputSchema>;
 
@@ -29,9 +29,9 @@ const prompt = ai.definePrompt({
   name: 'generateDrawingWordPrompt',
   input: {schema: GenerateDrawingWordInputSchema},
   output: {schema: GenerateDrawingWordOutputSchema},
-  prompt: `You are a helpful game master for a drawing game. Your task is to generate a single word for a player to draw, and output it in JSON format.
-The word must be suitable for a player with a "{{playerSkillLevel}}" skill level.
-It is crucial that the generated word has NOT been used before. The words that have already been used are:
+  prompt: `You are a helpful game master for a drawing game. Your task is to generate three unique words for a player to choose from, and output it in JSON format.
+The words must be suitable for a player with a "{{playerSkillLevel}}" skill level.
+It is crucial that the generated words have NOT been used before. The words that have already been used are:
 {{#if drawnWords}}
 {{#each drawnWords}}
 - "{{this}}"
@@ -41,12 +41,12 @@ It is crucial that the generated word has NOT been used before. The words that h
 {{/if}}
 
 Consider the player's skill level:
-- For 'beginner', provide common, easy-to-draw objects or concepts (e.g., "apple", "house").
+- For 'beginner', provide common, easy-to-draw objects or concepts (e.g., "apple", "house", "star").
 - For 'intermediate', provide slightly more complex objects, actions, or abstract concepts (e.g., "bicycle", "swimming", "happiness").
 - For 'advanced', provide challenging or abstract concepts, complex scenes, or specific items (e.g., "constellation", "epiphany", "quantum physics").
 
-Ensure the generated word is unique and challenging appropriately for the given skill level.
-Provide only the JSON object, do not add any other text.`
+Ensure the generated words are unique and challenging appropriately for the given skill level.
+Provide only the JSON object containing the "words" array, do not add any other text.`
 });
 
 const generateDrawingWordFlow = ai.defineFlow(

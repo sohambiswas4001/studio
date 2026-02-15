@@ -5,9 +5,9 @@ import { generateDrawingWord, type GenerateDrawingWordInput } from '@/ai/flows/g
 export async function getNewWordAction(input: GenerateDrawingWordInput) {
   try {
     const result = await generateDrawingWord(input);
-    return { success: true, word: result.word };
+    return { success: true, words: result.words };
   } catch (error) {
-    console.error('Error generating word:', error);
-    return { success: false, error: 'Failed to generate a new word.' };
+    console.error('Error generating words:', error);
+    return { success: false, error: 'Failed to generate new words.' };
   }
 }
