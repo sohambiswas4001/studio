@@ -78,7 +78,7 @@ export function GameHeader({ isDrawer, roomId, playerName }: GameHeaderProps) {
     setIsLoading(true);
     // In a real app, these would come from game state
     const input = {
-      drawnWords: ['house', 'cat'],
+      drawnWords: [],
       playerSkillLevel: 'intermediate' as const
     };
     const result = await getNewWordAction(input);
